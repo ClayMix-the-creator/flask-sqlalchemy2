@@ -3,6 +3,7 @@ from data import db_session
 from data.users import User
 from data.news import News
 from forms.user import RegisterForm
+import os.path
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -41,15 +42,30 @@ def reqister():
 
 
 def main():
-    db_session.global_init("db/blogs.sqlite")
-    app.run()
-    user = User()
-    user.name = "Пользователь 1"
-    user.about = "биография пользователя 1"
-    user.email = "email@email.ru"
-    db_sess = db_session.create_session()
-    db_sess.add(user)
-    db_sess.commit()
+    if os.path.exists('db/blogs.sqlite') is False:
+        db_session.global_init("db/blogs.sqlite")
+        app.run()
+        user = User()
+        user.name = "Пользователь 1"
+        user.about = "биография пользователя 1"
+        user.email = "email@email.ru"
+        db_sess = db_session.create_session()
+        db_sess.add(user)
+        db_sess.commit()
+    else:
+        if input('This DB already exists, recreate it?? (Y/N)\n') == 'Y':
+            os.remove('db/blogs.sqlite')
+            db_session.global_init("db/blogs.sqlite")
+            app.run()
+            user = User()
+            user.name = "Пользователь 1"
+            user.about = "биография пользователя 1"
+            user.email = "email@email.ru"
+            db_sess = db_session.create_session()
+            db_sess.add(user)
+            db_sess.commit()
+        else:
+            pass
 
 
 if __name__ == '__main__':
